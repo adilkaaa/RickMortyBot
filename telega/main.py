@@ -4,8 +4,6 @@ from aiogram.dispatcher.filters import Text
 from random import randint
 from aiogram.types import ParseMode
 from aiogram.utils.markdown import text, bold, italic, code, pre
-# from rick import get_character_info as info
-
 
 def get_character_data_by_name(name):
     response = requests.get(f"https://rickandmortyapi.com/api/character"
@@ -16,7 +14,6 @@ def get_character_data_by_name(name):
 
     return response.json()
 def get_character_info(name):
-    # name = input("enter character name please: ")
     data = get_character_data_by_name(name)
     character = data['results'][0]
 
@@ -56,18 +53,10 @@ async def show_info(message: types.Message):
 
 @dp.message_handler(commands = 'getcharacter')
 async def show_list_characters(message: types.Message):
-    # await message.answer('Choose character:')
+    characters = ['Rick Sanchez','Summer Smith','Morty Smith','Jerry Smith','Squanchy','Beth Smith','Krombopulos Michael','Reverse Giraffe','Birdperson']
     keyboard_inline = types.InlineKeyboardMarkup()
-    c1 = types.InlineKeyboardButton(text='Rick Sanchez',callback_data='rick sanchez')
-    c2 = types.InlineKeyboardButton(text='Morty Smith',callback_data='morty smith')
-    c3 = types.InlineKeyboardButton(text='Summer Smith',callback_data='summer smith')
-    c4 = types.InlineKeyboardButton(text='Jerry Smith',callback_data='jerry smith')
-    c5 = types.InlineKeyboardButton(text='Squanchy',callback_data='squanchy')
-    c6 = types.InlineKeyboardButton(text='Beth Smith',callback_data='beth smith')
-    c7 = types.InlineKeyboardButton(text='Krombopulos Michael',callback_data='krombopulos michael')
-    c8 = types.InlineKeyboardButton(text='Reverse Giraffe',callback_data='reverse giraffe')
-    c9 = types.InlineKeyboardButton(text='Birdperson',callback_data='birdperson')
-    keyboard_inline.add(c1,c2,c3,c4,c5,c6,c7,c8,c9)
+    character_list = [types.InlineKeyboardButton(text = characters[i],callback_data=characters[i].lower())for i in range(len(characters))]
+    keyboard_inline.add(*character_list)
     await message.answer('Choose one of them\n',reply_markup=keyboard_inline)
 
 @dp.callback_query_handler(text = ['rick sanchez','morty smith','summer smith','jerry smith','squanchy','beth smith','krombopulos michael','reverse giraffe','birdperson'])
@@ -79,7 +68,10 @@ async def answer(call: types.CallbackQuery):
     location = char['location']
     status = char['status']
     species = char['species']
-    episode = char['episode']
+
+    episode_o = char['episode']
+    episode = episode_o[str(episode_o).index('e')::]
+    
     t = char['type']
     await call.message.answer_photo(img)
 
@@ -92,14 +84,6 @@ Location: {location}\n
 Episode: {str(episode)}\n
 Continue chosing /getcharacter</b>""",parse_mode=ParseMode.HTML)
     
-
-    
-
-
-
-
-
-
 
 if __name__ == '__main__':
     executor.start_polling(dp,skip_updates=True)
